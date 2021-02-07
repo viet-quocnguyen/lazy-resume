@@ -1,11 +1,18 @@
 import React, { useMemo, useRef, useState } from "react";
 import axios from "axios";
 
-import { Container, Grid, Button, Box } from "@material-ui/core";
+import {
+	Container,
+	Grid,
+	Button,
+	Box,
+	CircularProgress,
+} from "@material-ui/core";
 import { DropzoneArea } from "material-ui-dropzone";
 import LinearProgressWithLabel from "./LinearProgressWithLabel.js";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack";
 import "./App.css";
+import UnionIcon from "./Union.svg";
 
 function App() {
 	const [file, setFile] = useState(""); // storing the uploaded file
@@ -13,12 +20,13 @@ function App() {
 	const [data, getFile] = useState(null);
 	const [progress, setProgess] = useState(0); // progess bar
 	const [highlights, setHighlights] = useState([]);
+	const [loading, setLoading] = useState(false);
 	// const el = useRef(); // accesing input element
 
 	const handleChange = (files) => {
 		setProgess(0);
-		const file = files[0]; // accesing file
-		console.log(file);
+		const file = files[files.length - 1]; // accesing the last file
+
 		setFile(file); // storing file
 	};
 	const uploadFile = () => {
@@ -26,6 +34,7 @@ function App() {
 			alert("Please choose a PDF file before upload");
 			return;
 		}
+		setLoading(true);
 		const formData = new FormData();
 		formData.append("file", file); // appending file
 		axios
@@ -47,8 +56,12 @@ function App() {
 					(obj) => Object.keys(obj)[0]
 				);
 				setHighlights(arrWords);
+				setLoading(false);
 			})
-			.catch((err) => console.log(err));
+			.catch((err) => {
+				setLoading(false);
+				console.log(err);
+			});
 	};
 
 	function highlightPattern(text, pattern) {
@@ -85,6 +98,15 @@ function App() {
 			{/* Uploading section */}
 			<Grid item xs={12} className="file-upload">
 				<Box height="40px" />
+				<h1>
+					Lazy Resume<img src={UnionIcon} alt="Union Logo"></img>
+				</h1>
+				<p>Need some quick advice for your resume?</p>
+				<p>
+					Upload your PDF resume, and get those fancy action verbs in
+					just one click!
+				</p>
+				<Box height="40px" />
 				<DropzoneArea onChange={handleChange} />
 				<Box height="20px" />
 				<LinearProgressWithLabel
@@ -105,8 +127,11 @@ function App() {
 				<hr />
 			</Grid>
 			<Box height="20px" />
-			{data && (
-				<Grid container spacing={3}>
+			<Grid style={{ textAlign: "center" }} item xs={12}>
+				{loading ? <CircularProgress /> : null}
+			</Grid>
+			{!loading && data && (
+				<Grid className="preview-section" container spacing={3}>
 					{data.name && (
 						<Document
 							file={`https://htn21backend.glitch.me/${data.name}`}

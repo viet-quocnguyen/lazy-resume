@@ -8,3 +8,9 @@
 .upload-button {
 	text-align: center;
 }
+
+.preview-section {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
