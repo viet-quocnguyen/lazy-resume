@@ -106,7 +106,7 @@ function App() {
 			</Grid>
 			<Box height="20px" />
 			{data && (
-				<Grid container spacing={1}>
+				<Grid container spacing={3}>
 					{data.name && (
 						<Document
 							file={`https://htn21backend.glitch.me/${data.name}`}
@@ -114,6 +114,17 @@ function App() {
 							<Page
 								pageNumber={1}
 								customTextRenderer={textRenderer}
+								onLoadSuccess={() => {
+									const textLayers = document.querySelectorAll(
+										".react-pdf__Page__textContent"
+									);
+									textLayers.forEach((layer) => {
+										const { style } = layer;
+										style.top = "0";
+										style.left = "0";
+										style.transform = "";
+									});
+								}}
 							/>
 						</Document>
 					)}
